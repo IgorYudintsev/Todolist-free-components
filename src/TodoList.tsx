@@ -1,21 +1,23 @@
-import React, {useState} from 'react';
+import React from 'react';
 import './App.css';
-import {Buttons} from "./components/Buttons";
-import {InputButton} from "./components/InputButton";
-import {CheckBox} from "./components/CheckBox";
+import {Button} from "./components/Button";
+import {Input} from "./components/Input";
+import {CheckBox} from "./components/Checkbox";
+import {EditableSpan} from "./components/EditableSpan";
 
 type titleType = {
-    id:string
-    title: string;
+    id: string
+    title: string
     Tasks: Array<arrayType>
-    addTask:(title:string,setTitle:(title: string)=>void,setError:(error:string|null)=>void,TasksId: string)=>void
-    removeTask: (removeId: string,TasksId: string) => void
-    changeFilter: (filterValue: string,todoListsId:string) => void
-    changeStatus:(isDoneValue:boolean,idValue:string,TasksId: string)=>void
-    filter:string
-    deleteTasks:(deleteTasksId:string)=>void;
-  }
-
+    addTask: (title: string, todolistsID: string) => void
+    RemoveTask: (id: string, todolistsID: string) => void
+    TaskFilter: (title: string, todolistsId: string) => void
+    Filter: string
+    changeStatus: (CheckBoxId: string, todolistsID: string) => void
+    RemoveTodolist: (todolistsID: string) => void;
+    saveNewTitle: (title: string, todolistsID: string, TasksID: string) => void
+    saveNewTitleTodolist:(title: string,todolistsID:string)=>void
+}
 type arrayType = {
     id: string;
     title: string;
@@ -23,53 +25,63 @@ type arrayType = {
 }
 
 export let TodoList = (props: titleType) => {
-    let [title, setTitle] = useState('');
-    let [error,setError]=useState()
-        return (
+    const addTaskHandler = (title: string) => {
+        props.addTask(title, props.id)
+    }
+
+
+    let saveNewTitleTodolistHandler=(title:string)=>{
+        props.saveNewTitleTodolist(title, props.id)
+    }
+
+    return (
         <div>
-            <h3><Buttons callBack={() => props.deleteTasks(props.id)} title={'X'}/>{' '}{props.title}</h3>
-            <div>
-                <InputButton callBack={()=>props.addTask(title,setTitle,setError,props.id)}
-                             title={title}
-                             setTitle={setTitle}
-                             error={error}
-                             setError={setError}
-                />
-            </div>
+            <Button callBack={() => props.RemoveTodolist(props.id)} title={'delete'}/>
+            <EditableSpan callBack={saveNewTitleTodolistHandler} title={props.title}/>
+               <Input callBack={addTaskHandler}/>
             <ul>
-                {props.Tasks.map(m =>
-                    <li>
-                        <Buttons callBack={() => props.removeTask(m.id,props.id)} title={'X'}/>
-                        <CheckBox callBack={()=>props.changeStatus(m.isDone,m.id,props.id)} checked={m.isDone}/>
-                        <span>{m.title}</span>
-                    </li>)}
+                {props.Tasks.map(m => {
+                    const saveNewTitleHandler = (title: string) => {
+                        props.saveNewTitle(title, props.id, m.id)
+                    }
+                    return (<li>
+                        <Button callBack={() => props.RemoveTask(m.id, props.id)} title={'delete'}/>
+                        <CheckBox callBack={() => props.changeStatus(m.id, props.id)} isDone={m.isDone}/>
+                        <EditableSpan callBack={saveNewTitleHandler} title={m.title}/>
+                    </li>)
+                })
+                }
             </ul>
             <div>
-                <Buttons callBack={() => props.changeFilter('All',props.id)} title={'All'} filter={props.filter}/>
-                <Buttons callBack={() => props.changeFilter('Active',props.id)} title={'Active'} filter={props.filter}/>
-                <Buttons callBack={() => props.changeFilter('Completed',props.id)} title={'Completed'} filter={props.filter}/>
+                <Button callBack={() => props.TaskFilter('All', props.id)} title={'All'} Filter={props.Filter}/>
+                <Button callBack={() => props.TaskFilter('Active', props.id)} title={'Active'} Filter={props.Filter}/>
+                <Button callBack={() => props.TaskFilter('Completed', props.id)} title={'Completed'}
+                        Filter={props.Filter}/>
             </div>
         </div>
     )
 }
-//======================================
-// import React, {useState} from 'react';
+
+//==================================
+// import React from 'react';
 // import './App.css';
-// import {Buttons} from "./components/Buttons";
-// import {InputButton} from "./components/InputButton";
-// import {CheckBox} from "./components/CheckBox";
+// import {Button} from "./components/Button";
+// import {Input} from "./components/Input";
+// import {CheckBox} from "./components/Checkbox";
+// import {EditableSpan} from "./components/EditableSpan";
 //
 // type titleType = {
-//     id:string
-//     title: string;
+//     id: string
+//     title: string
 //     Tasks: Array<arrayType>
-//     addTask:(title:string,setTitle:(title: string)=>void,setError:(error:string|null)=>void,TasksId: string)=>void
-//     removeTask: (removeId: string,TasksId: string) => void
-//     changeFilter: (filterValue: string,todoListsId:string) => void
-//     changeStatus:(isDoneValue:boolean,idValue:string,TasksId: string)=>void
-//     filter:string
+//     addTask: (title: string, todolistsID: string) => void
+//     RemoveTask: (id: string, todolistsID: string) => void
+//     TaskFilter: (title: string, todolistsId: string) => void
+//     Filter: string
+//     changeStatus: (CheckBoxId: string, todolistsID: string) => void
+//     RemoveTodolist: (todolistsID: string) => void;
+//     saveNewTitle: (title:string,todolistsID:string,TasksID:string) => void
 // }
-//
 // type arrayType = {
 //     id: string;
 //     title: string;
@@ -77,31 +89,34 @@ export let TodoList = (props: titleType) => {
 // }
 //
 // export let TodoList = (props: titleType) => {
-//     let [title, setTitle] = useState('');
-//     let [error,setError]=useState()
+//     const addTaskHandler = (title: string) => {
+//         props.addTask(title, props.id)
+//     }
+//
 //     return (
 //         <div>
+//             <Button callBack={() => props.RemoveTodolist(props.id)} title={'delete'}/>
 //             <h3>{props.title}</h3>
-//             <div>
-//                 <InputButton callBack={()=>props.addTask(title,setTitle,setError,props.id)}
-//                              title={title}
-//                              setTitle={setTitle}
-//                              error={error}
-//                              setError={setError}
-//                 />
-//             </div>
+//             <Input callBack={addTaskHandler}/>
 //             <ul>
-//                 {props.Tasks.map(m =>
-//                     <li>
-//                         <Buttons callBack={() => props.removeTask(m.id,props.id)} title={'X'}/>
-//                         <CheckBox callBack={()=>props.changeStatus(m.isDone,m.id,props.id)} checked={m.isDone}/>
-//                         <span>{m.title}</span>
-//                     </li>)}
+//                 {props.Tasks.map(m =>{
+//                     const saveNewTitleHandler = (title: string) => {
+//                         props.saveNewTitle(title,props.id,m.id)
+//                     }
+//                     return (<li>
+//                         <Button callBack={() => props.RemoveTask(m.id, props.id)} title={'delete'}/>
+//                         <CheckBox callBack={() => props.changeStatus(m.id, props.id)} isDone={m.isDone}/>
+//                         <EditableSpan callBack={saveNewTitleHandler} title={m.title}/>
+//                     </li>)
+//                 })
+//                 }
+//
 //             </ul>
 //             <div>
-//                 <Buttons callBack={() => props.changeFilter('All',props.id)} title={'All'} filter={props.filter}/>
-//                 <Buttons callBack={() => props.changeFilter('Active',props.id)} title={'Active'} filter={props.filter}/>
-//                 <Buttons callBack={() => props.changeFilter('Completed',props.id)} title={'Completed'} filter={props.filter}/>
+//                 <Button callBack={() => props.TaskFilter('All', props.id)} title={'All'} Filter={props.Filter}/>
+//                 <Button callBack={() => props.TaskFilter('Active', props.id)} title={'Active'} Filter={props.Filter}/>
+//                 <Button callBack={() => props.TaskFilter('Completed', props.id)} title={'Completed'}
+//                         Filter={props.Filter}/>
 //             </div>
 //         </div>
 //     )
